@@ -1,1 +1,1 @@
-# curso-go-api-devbook
+# curso-go-devbook-app
