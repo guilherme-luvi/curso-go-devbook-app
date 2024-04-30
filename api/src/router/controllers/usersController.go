@@ -7,17 +7,17 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetUsers(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Criando Usuário!"))
+	w.Write([]byte("Buscando Usuarios!"))
 }
 
 func GetUserById(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Criando Usuário!"))
+	w.Write([]byte("Buscando Usuario por id!"))
 }
 
 func UpdateUser(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Criando Usuário!"))
+	w.Write([]byte("Editando Usuario!"))
 }
 
 func DeleteUser(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Criando Usuário!"))
+	w.Write([]byte("Deletando Usuário!"))
 }
