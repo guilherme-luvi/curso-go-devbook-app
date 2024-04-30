@@ -1,15 +1,22 @@
 package main
 
 import (
+	"api/src/config"
 	"api/src/router"
 	"fmt"
 	"log"
 	"net/http"
 )
 
+// Função main que executa a aplicação
 func main() {
-	fmt.Println("Rodando API!")
+	// Carregar variáveis de ambiente
+	config.LoadEnvVars()
+
+	// Carrgar rotas da API
 	router := router.Gerar()
 
-	log.Fatal(http.ListenAndServe(":5000", router))
+	// Executar aplicação na porta definida nas variaveis de ambiente
+	fmt.Println("Rodando API!")
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", config.Port), router))
 }
