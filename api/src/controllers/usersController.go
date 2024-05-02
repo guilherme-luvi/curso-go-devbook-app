@@ -25,6 +25,12 @@ func CreateUser(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
+	// Validar usuario recebido
+	if ex = user.Prepare(); ex != nil {
+		responses.Erro(writer, http.StatusBadRequest, ex)
+		return
+	}
+
 	// Abrir conexão com banco
 	db, ex := database.Connect()
 	if ex != nil {
