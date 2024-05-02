@@ -8,6 +8,7 @@ import (
 
 // Função de resposta genérica. Retorna resposta em Json para a requisição
 func JSON(writer http.ResponseWriter, statusCode int, data interface{}) {
+	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(statusCode)
 
 	if err := json.NewEncoder(writer).Encode(data); err != nil {
