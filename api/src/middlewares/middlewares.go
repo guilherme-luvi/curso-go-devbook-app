@@ -1,8 +1,8 @@
 package middlewares
 
 import (
-	auth "api/src/Auth"
-	responses "api/src/Responses"
+	auth "api/src/auth"
+	responses "api/src/responses"
 	"log"
 	"net/http"
 )

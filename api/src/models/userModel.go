@@ -1,7 +1,7 @@
 package models
 
 import (
-	auth "api/src/Auth"
+	auth "api/src/auth"
 	"errors"
 	"strings"
 	"time"

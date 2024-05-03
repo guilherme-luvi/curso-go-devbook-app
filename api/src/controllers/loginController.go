@@ -1,11 +1,11 @@
 package controllers
 
 import (
-	auth "api/src/Auth"
-	responses "api/src/Responses"
+	auth "api/src/auth"
 	"api/src/database"
 	"api/src/models"
 	"api/src/repositories"
+	responses "api/src/responses"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
