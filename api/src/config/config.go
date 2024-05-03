@@ -11,10 +11,13 @@ import (
 
 var (
 	// String de conexão com o MySql
-	DatabaseStringConnection = ""
+	DatabaseStringConnection string
 
 	// Porta onde a API estará rodando
-	Port = 0
+	Port int
+
+	// Secret Key é a chave que será utilizada para assinar os tokens jwt
+	SecretKey []byte
 )
 
 // Função que irá inicializar as variaveis de ambiente da aplicação
@@ -36,4 +39,6 @@ func LoadEnvVars() {
 		os.Getenv("DB_PASSWORD"),
 		os.Getenv("DB_NAME"),
 	)
+
+	SecretKey = []byte(os.Getenv("SECRET_KEY"))
 }

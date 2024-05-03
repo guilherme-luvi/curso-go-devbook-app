@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"api/src/config"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -26,5 +27,5 @@ func CreateToken(userID uint64) (string, error) {
 	permissions["userId"] = userID
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, permissions)
-	return token.SignedString([]byte("Secret"))
+	return token.SignedString([]byte(config.SecretKey))
 }
