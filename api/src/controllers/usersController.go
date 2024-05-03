@@ -1,12 +1,14 @@
 package controllers
 
 import (
+	auth "api/src/auth"
 	"api/src/database"
 	"api/src/models"
 	"api/src/repositories"
 	responses "api/src/responses"
 	"encoding/json"
-	"io/ioutil"
+	"errors"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -17,7 +19,7 @@ import (
 // Cria usuário por body da requisição
 func CreateUser(writer http.ResponseWriter, request *http.Request) {
 	// Leitura do body da requisição
-	requestBody, ex := ioutil.ReadAll(request.Body)
+	requestBody, ex := io.ReadAll(request.Body)
 	if ex != nil {
 		responses.Erro(writer, http.StatusUnprocessableEntity, ex)
 		return
@@ -112,7 +114,18 @@ func UpdateUser(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	requestBody, ex := ioutil.ReadAll(request.Body)
+	tokenUserID, ex := auth.ExtractUserID(request)
+	if ex != nil {
+		responses.Erro(writer, http.StatusUnauthorized, ex)
+		return
+	}
+
+	if userID != tokenUserID {
+		responses.Erro(writer, http.StatusForbidden, errors.New("não é possível atualizar um usuário que não seja o seu"))
+		return
+	}
+
+	requestBody, ex := io.ReadAll(request.Body)
 	if ex != nil {
 		responses.Erro(writer, http.StatusUnprocessableEntity, ex)
 		return
@@ -151,6 +164,17 @@ func DeleteUser(writer http.ResponseWriter, request *http.Request) {
 	userID, ex := strconv.ParseUint(parameters["userId"], 10, 64)
 	if ex != nil {
 		responses.Erro(writer, http.StatusBadRequest, ex)
+		return
+	}
+
+	tokenUserID, ex := auth.ExtractUserID(request)
+	if ex != nil {
+		responses.Erro(writer, http.StatusUnauthorized, ex)
+		return
+	}
+
+	if userID != tokenUserID {
+		responses.Erro(writer, http.StatusForbidden, errors.New("não é possível deletar um usuário que não seja o seu"))
 		return
 	}
 

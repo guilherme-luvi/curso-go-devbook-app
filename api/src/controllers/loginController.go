@@ -7,13 +7,13 @@ import (
 	"api/src/repositories"
 	responses "api/src/responses"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 )
 
 // Rota para autenticação. Retorna token jwt
 func Login(writer http.ResponseWriter, request *http.Request) {
-	requestBody, ex := ioutil.ReadAll(request.Body)
+	requestBody, ex := io.ReadAll(request.Body)
 	if ex != nil {
 		responses.Erro(writer, http.StatusUnprocessableEntity, ex)
 		return

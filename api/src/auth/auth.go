@@ -34,6 +34,28 @@ func CreateToken(userID uint64) (string, error) {
 	return token.SignedString([]byte(config.SecretKey))
 }
 
+// Extrai o ID do usuário do token
+func ExtractUserID(r *http.Request) (uint64, error) {
+	tokenString := extractToken(r)
+
+	// Método Parse obtem os claims do token recebido
+	token, err := jwt.Parse(tokenString, returnVerificationKey)
+	if err != nil {
+		return 0, err
+	}
+
+	// Verifica se os claims que a aplicação gera nos tokens pôde ser obtido no token informado e se o token é válido
+	if permissions, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		// Retorna o ID do usuário
+		userID := permissions["userId"]
+		if userIDFloat, ok := userID.(float64); ok {
+			return uint64(userIDFloat), nil
+		}
+	}
+
+	return 0, errors.New("token inválido")
+}
+
 // Valida se o token passado na requisição é valido
 func ValidateToken(r *http.Request) error {
 	tokenString := extractToken(r)
