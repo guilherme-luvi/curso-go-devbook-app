@@ -18,9 +18,9 @@ func NewUsersRepository(db *sql.DB) *users {
 	return &users{db}
 }
 
-// Método do struct user
-// recebe um model de User e retorna um uint e um erro
-// Cria um novo registro de usuario no banco
+// Métodos do struct user:
+
+// Cria um novo registro de usuario no banco a partir de um model de user
 func (repository users) Create(user models.User) (uint64, error) {
 	statement, ex := repository.db.Prepare(
 		"insert into users (name, nick, email, password) values(?, ?, ?, ?)",
@@ -115,6 +115,21 @@ func (repository users) Update(ID uint64, user models.User) error {
 	defer statement.Close()
 
 	if _, err = statement.Exec(user.Name, user.Nick, user.Email, ID); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Método que deleta registro com base no ID
+func (repository users) Delete(ID uint64) error {
+	statement, err := repository.db.Prepare("delete from users where id = ?")
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+
+	if _, err = statement.Exec(ID); err != nil {
 		return err
 	}
 

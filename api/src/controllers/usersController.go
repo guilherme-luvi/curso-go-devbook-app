@@ -14,6 +14,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// Cria usuário por body da requisição
 func CreateUser(writer http.ResponseWriter, request *http.Request) {
 	// Leitura do body da requisição
 	requestBody, ex := ioutil.ReadAll(request.Body)
@@ -54,9 +55,7 @@ func CreateUser(writer http.ResponseWriter, request *http.Request) {
 	responses.JSON(writer, http.StatusCreated, user)
 }
 
-// Busca usuarios no banco com base na query da URL
-// parametro 'user' na query
-// Busca por nome ou nick
+// Busca usuarios com base na query da URL. Parametro 'user' na query. Busca por nome ou nick
 func GetUsers(writer http.ResponseWriter, request *http.Request) {
 	nameOrNick := strings.ToLower(request.URL.Query().Get("user"))
 
@@ -104,6 +103,7 @@ func GetUserById(writer http.ResponseWriter, request *http.Request) {
 	responses.JSON(writer, http.StatusOK, user)
 }
 
+// Atualiza usuário por ID no path da requisição
 func UpdateUser(writer http.ResponseWriter, request *http.Request) {
 	parameters := mux.Vars(request)
 	userID, ex := strconv.ParseUint(parameters["userId"], 10, 64)
@@ -142,9 +142,30 @@ func UpdateUser(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	responses.JSON(writer, http.StatusOK, nil)
+	responses.JSON(writer, http.StatusNoContent, nil)
 }
 
+// Deleta usuário por ID no path da requisição
 func DeleteUser(writer http.ResponseWriter, request *http.Request) {
-	writer.Write([]byte("Deletando Usuário!"))
+	parameters := mux.Vars(request)
+	userID, ex := strconv.ParseUint(parameters["userId"], 10, 64)
+	if ex != nil {
+		responses.Erro(writer, http.StatusBadRequest, ex)
+		return
+	}
+
+	db, ex := database.Connect()
+	if ex != nil {
+		responses.Erro(writer, http.StatusInternalServerError, ex)
+		return
+	}
+	defer db.Close()
+
+	repository := repositories.NewUsersRepository(db)
+	if ex = repository.Delete(userID); ex != nil {
+		responses.Erro(writer, http.StatusInternalServerError, ex)
+		return
+	}
+
+	responses.JSON(writer, http.StatusNoContent, nil)
 }
