@@ -1,6 +1,7 @@
 package models
 
 import (
+	auth "api/src/Auth"
 	"errors"
 	"strings"
 	"time"
@@ -23,7 +24,10 @@ func (user *User) Prepare(step string) error {
 		return err
 	}
 
-	user.formater()
+	if err := user.formater(step); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -51,8 +55,19 @@ func (user *User) validate(step string) error {
 	return nil
 }
 
-func (user *User) formater() {
+func (user *User) formater(step string) error {
 	user.Name = strings.TrimSpace(user.Name)
 	user.Nick = strings.TrimSpace(user.Nick)
 	user.Email = strings.TrimSpace(user.Email)
+
+	if step == "creation" {
+		hashPassword, err := auth.Hash(user.Password)
+		if err != nil {
+			return err
+		}
+
+		user.Password = string(hashPassword)
+	}
+
+	return nil
 }
