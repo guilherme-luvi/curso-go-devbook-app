@@ -30,7 +30,7 @@ func CreateUser(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	// Validar usuario recebido
-	if ex = user.Prepare(); ex != nil {
+	if ex = user.Prepare("creation"); ex != nil {
 		responses.Erro(writer, http.StatusBadRequest, ex)
 		return
 	}
@@ -104,10 +104,47 @@ func GetUserById(writer http.ResponseWriter, request *http.Request) {
 	responses.JSON(writer, http.StatusOK, user)
 }
 
-func UpdateUser(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Editando Usuario!"))
+func UpdateUser(writer http.ResponseWriter, request *http.Request) {
+	parameters := mux.Vars(request)
+	userID, ex := strconv.ParseUint(parameters["userId"], 10, 64)
+	if ex != nil {
+		responses.Erro(writer, http.StatusBadRequest, ex)
+		return
+	}
+
+	requestBody, ex := ioutil.ReadAll(request.Body)
+	if ex != nil {
+		responses.Erro(writer, http.StatusUnprocessableEntity, ex)
+		return
+	}
+
+	var user models.User
+	if ex = json.Unmarshal(requestBody, &user); ex != nil {
+		responses.Erro(writer, http.StatusBadRequest, ex)
+		return
+	}
+
+	if ex = user.Prepare("update"); ex != nil {
+		responses.Erro(writer, http.StatusBadRequest, ex)
+		return
+	}
+
+	db, ex := database.Connect()
+	if ex != nil {
+		responses.Erro(writer, http.StatusInternalServerError, ex)
+		return
+	}
+	defer db.Close()
+
+	repository := repositories.NewUsersRepository(db)
+	if ex = repository.Update(userID, user); ex != nil {
+		responses.Erro(writer, http.StatusInternalServerError, ex)
+		return
+	}
+
+	responses.JSON(writer, http.StatusOK, nil)
 }
 
-func DeleteUser(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Deletando Usuário!"))
+func DeleteUser(writer http.ResponseWriter, request *http.Request) {
+	writer.Write([]byte("Deletando Usuário!"))
 }
