@@ -8,7 +8,10 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"strings"
+
+	"github.com/gorilla/mux"
 )
 
 func CreateUser(writer http.ResponseWriter, request *http.Request) {
@@ -74,8 +77,31 @@ func GetUsers(writer http.ResponseWriter, request *http.Request) {
 	responses.JSON(writer, http.StatusOK, users)
 }
 
-func GetUserById(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Buscando Usuario por id!"))
+// Busca usuário por ID no path da requisição
+func GetUserById(writer http.ResponseWriter, request *http.Request) {
+	parameters := mux.Vars(request)
+
+	userID, ex := strconv.ParseUint(parameters["userId"], 10, 64) //conversao na base 10, 64 bits
+	if ex != nil {
+		responses.Erro(writer, http.StatusBadRequest, ex)
+		return
+	}
+
+	db, ex := database.Connect()
+	if ex != nil {
+		responses.Erro(writer, http.StatusInternalServerError, ex)
+		return
+	}
+	defer db.Close()
+
+	repository := repositories.NewUsersRepository(db)
+	user, ex := repository.GetById(userID)
+	if ex != nil {
+		responses.Erro(writer, http.StatusInternalServerError, ex)
+		return
+	}
+
+	responses.JSON(writer, http.StatusOK, user)
 }
 
 func UpdateUser(w http.ResponseWriter, r *http.Request) {

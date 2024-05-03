@@ -51,11 +51,9 @@ func (repository users) Get(nameOrNick string) ([]models.User, error) {
 		"select id, name, nick, email, createdat from users where name LIKE ? or nick LIKE ?",
 		nameOrNick, nameOrNick,
 	)
-
 	if err != nil {
 		return nil, err
 	}
-
 	defer results.Close()
 
 	var users []models.User
@@ -75,6 +73,33 @@ func (repository users) Get(nameOrNick string) ([]models.User, error) {
 
 		users = append(users, user)
 	}
-
 	return users, nil
+}
+
+// Método que busca usuario por Id
+func (repository users) GetById(ID uint64) (models.User, error) {
+	results, err := repository.db.Query(
+		"select id, name, nick, email, createdat from users where id = ?",
+		ID,
+	)
+	if err != nil {
+		return models.User{}, err
+	}
+	defer results.Close()
+
+	var user models.User
+
+	if results.Next() {
+		if err = results.Scan(
+			&user.ID,
+			&user.Name,
+			&user.Nick,
+			&user.Email,
+			&user.CreatedAt,
+		); err != nil {
+			return models.User{}, err
+		}
+	}
+
+	return user, nil
 }
