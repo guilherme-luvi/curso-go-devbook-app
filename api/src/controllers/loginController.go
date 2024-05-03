@@ -11,6 +11,7 @@ import (
 	"net/http"
 )
 
+// Rota para autenticação. Retorna token jwt
 func Login(writer http.ResponseWriter, request *http.Request) {
 	requestBody, ex := ioutil.ReadAll(request.Body)
 	if ex != nil {
@@ -43,5 +44,6 @@ func Login(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	responses.JSON(writer, http.StatusOK, "Autorizado")
+	token, _ := auth.CreateToken(userRegisteredInDatabase.ID)
+	responses.JSON(writer, http.StatusOK, token)
 }
